@@ -7,7 +7,7 @@ CREATE TABLE contests (
     updated_at TIMESTAMP DEFAULT current_timestamp NOT NULL,
     title VARCHAR(128) NOT NULL,
     num_items INTEGER DEFAULT 0 NOT NULL,
-    visible BOOLEAN DEFAULT TRUE
+    visible BOOLEAN DEFAULT TRUE NOT NULL
 );
 SELECT diesel_manage_updated_at('contests');
 

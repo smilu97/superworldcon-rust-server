@@ -11,10 +11,14 @@ rocket = "0.4.5"
 rocket_cors = "0.5.1"
 serde = "1.0.0"
 serde_json = "1.0.0"
-diesel = { version = "1.4.4", features = ["postgres"] }
+serde_derive = "1.0.0"
+diesel = { version = "1.4.4", features = ["postgres", "uuidv07", "chrono", "serde_json"] }
 dotenv = "0.15.0"
+uuid = { version = "0.8", features = ["serde", "v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+superslice = "1"
 
 [dependencies.rocket_contrib]
 version = "0.4.5"
 default-features = false
-features = ["json"]
+features = ["json", "diesel_postgres_pool"]

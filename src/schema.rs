@@ -51,7 +51,7 @@ table! {
         updated_at -> Timestamp,
         title -> Varchar,
         num_items -> Int4,
-        visible -> Nullable<Bool>,
+        visible -> Bool,
     }
 }
 

@@ -1,6 +1,6 @@
 use rocket::get;
 
-#[get("/")]
+#[get("/ping")]
 pub fn handle_get_ping() -> &'static str {
     "pong"
 }
