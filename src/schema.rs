@@ -16,6 +16,8 @@ table! {
         created_at -> Timestamp,
         updated_at -> Timestamp,
         title -> Varchar,
+        count_win -> Int8,
+        count_lose -> Int8,
         contest_id -> Uuid,
     }
 }
@@ -37,7 +39,7 @@ table! {
         id -> Uuid,
         created_at -> Timestamp,
         updated_at -> Timestamp,
-        user_id -> Uuid,
+        user_id -> Nullable<Uuid>,
         contest_id -> Uuid,
     }
 }
@@ -49,6 +51,7 @@ table! {
         updated_at -> Timestamp,
         title -> Varchar,
         num_items -> Int4,
+        visible -> Nullable<Bool>,
     }
 }
 

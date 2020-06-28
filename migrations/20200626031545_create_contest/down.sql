@@ -4,3 +4,5 @@ DROP TABLE contest_rounds;
 DROP TABLE contest_item_descs;
 DROP TABLE contest_items;
 DROP TABLE contests;
+
+DROP FUNCTION IF EXISTS set_cnt_win_lose();
