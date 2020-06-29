@@ -1,5 +1,5 @@
 -- This file should undo anything in `up.sql`
-DROP TABLE matches;
+DROP TABLE match_records;
 DROP TABLE tournaments;
 DROP TABLE contest_item_descs;
 DROP TABLE contest_items;

@@ -2,6 +2,7 @@ use rocket::{get, post};
 use rocket_contrib::json::Json;
 use serde_json::json;
 use diesel::prelude::*;
+use chrono::{Utc, Duration};
 use rand::{Rng, thread_rng};
 use rand::distributions::Alphanumeric;
 
@@ -56,22 +57,32 @@ pub fn handle_post_login(db: DbConn, login_in: Json<LoginInput>) -> APIResponse 
         return responses::unauthorized().message("Username or password incorrect.");
     }
 
-    let rng = thread_rng();
-    let new_auth_token = rng
-        .sample_iter(&Alphanumeric)
-        .take(32)
-        .collect::<String>();
-    
-    diesel::update(
-        users.filter(schema::users::id.eq(user.id))
-    )
-        .set(current_auth_token.eq(&new_auth_token))
-        .execute(&*db)
-        .expect("Error");
+    let token: String;
+
+    if user.has_valid_auth_token(Duration::days(3650)) {
+        token = user.current_auth_token.unwrap();
+    } else {
+        let rng = thread_rng();
+        let new_auth_token = rng
+            .sample_iter(&Alphanumeric)
+            .take(32)
+            .collect::<String>();
+        
+        diesel::update(
+            users.filter(schema::users::id.eq(user.id))
+        )
+            .set((
+                current_auth_token.eq(&new_auth_token),
+                last_login.eq(&Utc::now().naive_utc()),
+            ))
+            .execute(&*db)
+            .expect("Error");
+        token = new_auth_token;
+    }   
     
     responses::ok().data(json!({
         "message": "login success",
         "id": user.id,
-        "token": new_auth_token,
+        "token": token,
     }))
 }

@@ -1,25 +1,19 @@
-use rocket::{get, post};
-use rocket::http::RawStr;
+use rocket::post;
 use rocket_contrib::json::Json;
 use serde_json::json;
-use uuid::Uuid;
-use std::str::FromStr;
 use diesel::prelude::*;
 
 use crate::database::DbConn;
 use crate::responses::{self, APIResponse};
-use crate::utils;
 
 use crate::models::user::User;
 use crate::models::tournament::{
     Tournament,
-    MatchRecord,
 
     NewTournament,
     NewMatchRecord,
 
     TournamentInput,
-    MatchRecordInput,
 };
 
 #[post("/tournament", data = "<in_tour>", format = "application/json")]
@@ -44,7 +38,7 @@ pub fn handle_post_tournament(user: User, db: DbConn, in_tour: Json<TournamentIn
             tournament_id: tour.id,
         }
     }).collect();
-    let records = diesel::insert_into(match_records)
+    diesel::insert_into(match_records)
         .values(new_records)
         .execute(&*db)
         .expect("Failed to insert new records");

@@ -6,7 +6,7 @@ use diesel::prelude::*;
 use ring::constant_time::verify_slices_are_equal;
 use serde_derive::{Deserialize, Serialize};
 use uuid::Uuid;
-use chrono::NaiveDateTime;
+use chrono::{Duration, NaiveDateTime, Utc};
 use argon2rs::argon2i_simple;
 
 use crate::database::DbConn;
@@ -22,6 +22,7 @@ pub struct User {
     #[serde(skip_serializing)]
     pub password_hash: Vec<u8>,
     pub current_auth_token: Option<String>,
+    pub last_login: Option<NaiveDateTime>,
 }
 
 #[derive(Insertable, Deserialize, Serialize)]
@@ -63,6 +64,18 @@ impl User {
             }
         }
         None
+    }
+    pub fn has_valid_auth_token(&self, auth_token_timeout: Duration) -> bool {
+        let latest_valid_date = Utc::now() - auth_token_timeout;
+        if let Some(last_login) = self.last_login {
+            if self.current_auth_token.is_some() {
+                last_login > latest_valid_date.naive_utc()
+            } else {
+                false
+            }
+        } else {
+            false
+        }
     }
 }
 
