@@ -17,6 +17,9 @@ dotenv = "0.15.0"
 uuid = { version = "0.8", features = ["serde", "v4"] }
 chrono = { version = "0.4", features = ["serde"] }
 superslice = "1"
+argon2rs = "0.2"
+rand = "0.7"
+ring = "0.13"
 
 [dependencies.rocket_contrib]
 version = "0.4.5"

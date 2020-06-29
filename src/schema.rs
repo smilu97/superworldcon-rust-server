@@ -63,7 +63,6 @@ table! {
         email -> Varchar,
         password_hash -> Bytea,
         current_auth_token -> Nullable<Varchar>,
-        last_action -> Nullable<Timestamp>,
     }
 }
 

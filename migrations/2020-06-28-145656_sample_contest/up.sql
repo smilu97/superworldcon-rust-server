@@ -6,7 +6,7 @@ DECLARE
     l_contest_item_id_2 UUID;
     l_contest_round_id UUID;
 BEGIN
-    INSERT INTO users(email, password_hash) VALUES ('admin@mail.com', 'todo');
+    INSERT INTO users(email, password_hash) VALUES ('admin@mail.com', '\x90a7a04aab8678267c0268f34ebad993dbd7a8c7c3345ca7fc82966eace8115c');
     SELECT id INTO l_admin_id FROM users WHERE email = 'admin@mail.com';
     INSERT INTO contests(title, num_items) VALUES ('sample contest', 2);
     SELECT id INTO l_contest_id FROM contests WHERE title = 'sample contest';
