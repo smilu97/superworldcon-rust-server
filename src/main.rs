@@ -25,12 +25,13 @@ fn main() -> Result<(), String> {
         .manage(app_config)
         .mount("/", routes![
             apis::ping::handle_get_ping,
-            apis::contests::handle_get_contests,
-            apis::contests::handle_get_contest,
-            apis::contests::handle_post_contest,
+            apis::contest::handle_get_contests,
+            apis::contest::handle_get_contest,
+            apis::contest::handle_post_contest,
             apis::user::handle_get_whoami,
             apis::user::handle_post_register,
             apis::user::handle_post_login,
+            apis::tournament::handle_post_tournament,
         ])
         .register(catchers![
             handlers::bad_request_handler,

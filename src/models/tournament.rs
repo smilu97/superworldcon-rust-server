@@ -45,7 +45,6 @@ pub struct NewMatchRecord {
 
 #[derive(Deserialize, Serialize)]
 pub struct TournamentInput {
-    pub user_id: Uuid,
     pub contest_id: Uuid,
     pub records: Vec<MatchRecordInput>,
 }

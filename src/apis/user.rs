@@ -1,9 +1,6 @@
 use rocket::{get, post};
-use rocket::http::RawStr;
 use rocket_contrib::json::Json;
 use serde_json::json;
-use uuid::Uuid;
-use std::str::FromStr;
 use diesel::prelude::*;
 use rand::{Rng, thread_rng};
 use rand::distributions::Alphanumeric;
@@ -11,7 +8,6 @@ use rand::distributions::Alphanumeric;
 use crate::schema;
 use crate::database::DbConn;
 use crate::responses::{self, APIResponse};
-use crate::utils;
 
 use crate::models::user::User;
 use crate::models::user::NewUser;
