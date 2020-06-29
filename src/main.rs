@@ -11,6 +11,8 @@ mod database;
 mod handlers;
 mod responses;
 mod schema;
+mod utils;
+mod models;
 
 fn main() -> Result<(), String> {
     dotenv().ok();

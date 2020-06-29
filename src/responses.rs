@@ -4,6 +4,7 @@ use rocket::request::Request;
 use rocket::response::{Responder, Response};
 use rocket_contrib::json;
 use rocket_contrib::json::JsonValue;
+use serde::Serialize;
 use std::convert::From;
 use std::io::Cursor;
 
@@ -15,8 +16,8 @@ pub struct APIResponse {
 
 impl APIResponse {
     /// Set the data of the `Response` to `data`.
-    pub fn data(mut self, data: JsonValue) -> APIResponse {
-        self.data = data;
+    pub fn data<T: Serialize>(mut self, data: T) -> APIResponse {
+        self.data = json!(data);
         self
     }
 
