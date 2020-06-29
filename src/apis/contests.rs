@@ -1,5 +1,6 @@
-use rocket::get;
+use rocket::{get, post};
 use rocket::http::RawStr;
+use rocket_contrib::json::Json;
 use serde_json::json;
 use uuid::Uuid;
 use std::str::FromStr;
@@ -12,6 +13,12 @@ use crate::utils;
 use crate::models::contest::Contest;
 use crate::models::contest::ContestItem;
 use crate::models::contest::ContestItemDesc;
+
+use crate::models::contest::NewContest;
+use crate::models::contest::NewContestItem;
+use crate::models::contest::NewContestItemDesc;
+
+use crate::models::contest::ContestInput;
 
 #[get("/contests")]
 pub fn handle_get_contests(db: DbConn) -> APIResponse {
@@ -61,4 +68,53 @@ pub fn handle_get_contest(s_cid: &RawStr, db: DbConn) -> APIResponse {
     );
     
     responses::ok().data(j_contest)
+}
+
+#[post("/contest", data = "<in_contest>", format = "application/json")]
+pub fn handle_post_contest(in_contest: Json<ContestInput>, db: DbConn) -> APIResponse {
+    use crate::schema::contests::dsl::*;
+    use crate::schema::contest_items::dsl::*;
+    use crate::schema::contest_item_descs::dsl::*;
+
+    let new_contest = NewContest {
+        title: in_contest.title.clone(),
+        num_items: in_contest.num_items,
+    };
+    let res_contest = diesel::insert_into(contests)
+        .values(new_contest)
+        .get_result::<Contest>(&*db)
+        .expect("Error inserting contest");
+
+    let new_items: Vec<NewContestItem> = (&in_contest.items).into_iter().map(|x| -> NewContestItem {
+        NewContestItem {
+            contest_id: res_contest.id,
+            title: x.title.clone(),
+        }
+    }).collect();
+    let res_items = diesel::insert_into(contest_items)
+        .values(new_items)
+        .get_results::<ContestItem>(&*db)
+        .expect("Error inserting contest items");
+    
+    let v2_new_descs: Vec<Vec<NewContestItemDesc>> = (&in_contest.items).into_iter()
+        .enumerate().map(|(ci, c)| -> Vec<NewContestItemDesc> {
+        (&c.descriptions).into_iter().map(|x| -> NewContestItemDesc {
+            NewContestItemDesc {
+                contest_item_id: res_items[ci].id,
+                title: x.title.clone(),
+                desc_type: x.desc_type.clone(),
+                url: x.url.clone(),
+            }
+        }).collect()
+    }).collect();
+    let new_descs: Vec<NewContestItemDesc> = v2_new_descs.into_iter().flatten().collect();
+    diesel::insert_into(contest_item_descs)
+        .values(new_descs)
+        .execute(&*db)
+        .expect("Error inserting contest item descriptions");
+
+    responses::created().data(json!({
+        "message": "successfully created a new contest",
+        "id": res_contest.id,
+    }))
 }

@@ -27,6 +27,7 @@ fn main() -> Result<(), String> {
             apis::ping::handle_get_ping,
             apis::contests::handle_get_contests,
             apis::contests::handle_get_contest,
+            apis::contests::handle_post_contest,
         ])
         .register(catchers![
             handlers::bad_request_handler,
