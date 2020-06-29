@@ -11,7 +11,7 @@ pub struct Tournament {
     pub id: Uuid,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
-    pub user_id: Uuid,
+    pub user_id: Option<Uuid>,
     pub contest_id: Uuid,
 }
 

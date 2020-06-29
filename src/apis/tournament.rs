@@ -10,7 +10,7 @@ use crate::database::DbConn;
 use crate::responses::{self, APIResponse};
 use crate::utils;
 
-use crate::models::User;
+use crate::models::user::User;
 use crate::models::tournament::{
     Tournament,
     MatchRecord,
@@ -31,12 +31,12 @@ pub fn handle_post_tournament(user: User, db: DbConn, in_tour: Json<TournamentIn
         user_id: user.id,
         contest_id: in_tour.contest_id,
     }; 
-    let tour = diesel::insert_into(tournaments)
+    let tour: Tournament = diesel::insert_into(tournaments)
         .values(new_tour)
         .get_result(&*db)
         .expect("Failed to insert new tournament");
     
-    let new_records: Vec<NewMatchRecord> = in_tour.records.into_iter().map(|x| -> NewMatchRecord {
+    let new_records: Vec<NewMatchRecord> = (&in_tour.records).into_iter().map(|x| -> NewMatchRecord {
         NewMatchRecord {
             size: x.size,
             win_id: x.win_id,
