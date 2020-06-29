@@ -50,6 +50,8 @@ CREATE TABLE tournaments (
 );
 SELECT diesel_manage_updated_at('tournaments');
 
+CREATE UNIQUE INDEX tour_contest_user_idx ON tournaments (user_id, contest_id);
+
 CREATE TABLE match_records (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     created_at TIMESTAMP DEFAULT current_timestamp NOT NULL,
