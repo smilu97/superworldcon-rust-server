@@ -29,8 +29,11 @@ pub fn handle_get_contest(s_cid: &RawStr, db: DbConn) -> APIResponse {
     use crate::schema::contest_items::dsl::*;
     use crate::schema::contest_item_descs::dsl::*;
 
-    let cid = Uuid::from_str(s_cid.as_str())
-        .expect("Error parsing contest id");
+    let cid_result = Uuid::from_str(s_cid.as_str());
+    if cid_result.is_err() {
+        return responses::unprocessable_entity(json!("Failed to parse contest id"));
+    }
+    let cid = cid_result.unwrap();
         
     let r_contest = contests
         .filter(crate::schema::contests::id.eq(&cid))

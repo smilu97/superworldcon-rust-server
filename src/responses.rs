@@ -116,7 +116,7 @@ pub fn conflict() -> APIResponse {
     }
 }
 
-pub fn unprocessable_entity(errors: JsonValue) -> APIResponse {
+pub fn unprocessable_entity<T: Serialize>(errors: T) -> APIResponse {
     APIResponse {
         data: json!({ "message": errors }),
         status: Status::UnprocessableEntity,
