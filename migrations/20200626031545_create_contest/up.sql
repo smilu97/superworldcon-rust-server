@@ -38,7 +38,7 @@ CREATE TABLE contest_item_descs (
 );
 SELECT diesel_manage_updated_at('contest_item_descs');
 
-CREATE TABLE contest_rounds (
+CREATE TABLE tournaments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     created_at TIMESTAMP DEFAULT current_timestamp NOT NULL,
     updated_at TIMESTAMP DEFAULT current_timestamp NOT NULL,
@@ -48,34 +48,34 @@ CREATE TABLE contest_rounds (
     FOREIGN KEY (contest_id) REFERENCES contests (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
 );
-SELECT diesel_manage_updated_at('contest_rounds');
+SELECT diesel_manage_updated_at('tournaments');
 
-CREATE TABLE contest_round_matches (
+CREATE TABLE match_records (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     created_at TIMESTAMP DEFAULT current_timestamp NOT NULL,
     updated_at TIMESTAMP DEFAULT current_timestamp NOT NULL,
 
-    match_size INTEGER NOT NULL,
+    size INTEGER NOT NULL,
     win_id UUID NOT NULL,
     lose_id UUID NOT NULL,
     FOREIGN KEY (win_id)  REFERENCES contest_items (id) ON DELETE CASCADE,
     FOREIGN KEY (lose_id) REFERENCES contest_items (id) ON DELETE CASCADE,
 
-    contest_round_id UUID NOT NULL,
-    FOREIGN KEY (contest_round_id) REFERENCES contest_rounds (id) ON DELETE CASCADE
+    tournament_id UUID NOT NULL,
+    FOREIGN KEY (tournament_id) REFERENCES tournaments (id) ON DELETE CASCADE
 );
-SELECT diesel_manage_updated_at('contest_round_matches');
+SELECT diesel_manage_updated_at('match_records');
 
 CREATE OR REPLACE FUNCTION set_cnt_win_lose() RETURNS trigger AS $trigger_set_cnt_win_lose$
 BEGIN
     UPDATE contest_items
         SET count_win = (
-            SELECT count(*) FROM contest_round_matches WHERE win_id = NEW.win_id
+            SELECT count(*) FROM match_records WHERE win_id = NEW.win_id
         )
         WHERE id = NEW.win_id;
     UPDATE contest_items
         SET count_lose = (
-            SELECT count(*) FROM contest_round_matches WHERE lose_id = NEW.lose_id
+            SELECT count(*) FROM match_records WHERE lose_id = NEW.lose_id
         )
         WHERE id = NEW.lose_id;
     RETURN NULL;
@@ -83,5 +83,5 @@ END;
 $trigger_set_cnt_win_lose$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trigger_set_cnt_win_lose
-    AFTER INSERT OR UPDATE OR DELETE ON contest_round_matches
+    AFTER INSERT OR UPDATE OR DELETE ON match_records
     FOR EACH ROW EXECUTE PROCEDURE set_cnt_win_lose();

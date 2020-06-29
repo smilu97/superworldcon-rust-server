@@ -64,20 +64,20 @@ pub struct NewContestItemDesc {
     pub contest_item_id: Uuid,
 }
 
-#[derive(serde::Deserialize, serde::Serialize)]
+#[derive(Deserialize, Serialize)]
 pub struct DescInput {
     pub title: String,
     pub desc_type: String,
     pub url: String,
 }
 
-#[derive(serde::Deserialize, serde::Serialize)]
+#[derive(Deserialize, Serialize)]
 pub struct ItemInput {
     pub title: String,
     pub descriptions: Vec<DescInput>,
 }
 
-#[derive(serde::Deserialize, serde::Serialize)]
+#[derive(Deserialize, Serialize)]
 pub struct ContestInput {
     pub title: String,
     pub num_items: i32,

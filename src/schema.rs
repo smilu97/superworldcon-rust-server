@@ -23,28 +23,6 @@ table! {
 }
 
 table! {
-    contest_round_matches (id) {
-        id -> Uuid,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
-        match_size -> Int4,
-        win_id -> Uuid,
-        lose_id -> Uuid,
-        contest_round_id -> Uuid,
-    }
-}
-
-table! {
-    contest_rounds (id) {
-        id -> Uuid,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
-        user_id -> Nullable<Uuid>,
-        contest_id -> Uuid,
-    }
-}
-
-table! {
     contests (id) {
         id -> Uuid,
         created_at -> Timestamp,
@@ -52,6 +30,28 @@ table! {
         title -> Varchar,
         num_items -> Int4,
         visible -> Bool,
+    }
+}
+
+table! {
+    match_records (id) {
+        id -> Uuid,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+        size -> Int4,
+        win_id -> Uuid,
+        lose_id -> Uuid,
+        tournament_id -> Uuid,
+    }
+}
+
+table! {
+    tournaments (id) {
+        id -> Uuid,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+        user_id -> Nullable<Uuid>,
+        contest_id -> Uuid,
     }
 }
 
@@ -68,15 +68,15 @@ table! {
 
 joinable!(contest_item_descs -> contest_items (contest_item_id));
 joinable!(contest_items -> contests (contest_id));
-joinable!(contest_round_matches -> contest_rounds (contest_round_id));
-joinable!(contest_rounds -> contests (contest_id));
-joinable!(contest_rounds -> users (user_id));
+joinable!(match_records -> tournaments (tournament_id));
+joinable!(tournaments -> contests (contest_id));
+joinable!(tournaments -> users (user_id));
 
 allow_tables_to_appear_in_same_query!(
     contest_item_descs,
     contest_items,
-    contest_round_matches,
-    contest_rounds,
     contests,
+    match_records,
+    tournaments,
     users,
 );
