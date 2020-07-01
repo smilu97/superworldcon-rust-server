@@ -5,14 +5,18 @@ use serde_json::json;
 use uuid::Uuid;
 use std::str::FromStr;
 use diesel::prelude::*;
+use superslice::*;
 
 use crate::database::DbConn;
 use crate::responses::{self, APIResponse};
 use crate::utils;
+use crate::schema;
 
 use crate::models::contest::Contest;
 use crate::models::contest::ContestItem;
 use crate::models::contest::ContestItemDesc;
+use crate::models::tournament::Tournament;
+use crate::models::user::User;
 
 use crate::models::contest::NewContest;
 use crate::models::contest::NewContestItem;
@@ -21,13 +25,28 @@ use crate::models::contest::NewContestItemDesc;
 use crate::models::contest::ContestInput;
 
 #[get("/contests")]
-pub fn handle_get_contests(db: DbConn) -> APIResponse {
+pub fn handle_get_contests(opt_user: Option<User>, db: DbConn) -> APIResponse {
     use crate::schema::contests::dsl::*;
     let r_contests = contests
         .load::<Contest>(&*db)
         .expect("Error loading contests");
-    
-    responses::ok().data(r_contests)
+    let mut j_contests = json!(r_contests);
+
+    if let Some(user) = opt_user {
+        use crate::schema::tournaments::dsl::*;
+        let prev_contest_ids = tournaments
+            .select(schema::tournaments::contest_id)
+            .filter(schema::tournaments::user_id.eq(user.id))
+            .get_results::<Uuid>(&*db)
+            .expect("Error loading tournament ids");
+        for i in 0..r_contests.len() {
+            let cid = r_contests[i].id;
+            let f_res = prev_contest_ids.binary_search(&cid);
+            j_contests[i]["done"] = json!(f_res.is_ok());
+        }
+    }
+
+    responses::ok().data(j_contests)
 }
 
 #[get("/contest/<s_cid>")]
@@ -43,7 +62,7 @@ pub fn handle_get_contest(s_cid: &RawStr, db: DbConn) -> APIResponse {
     let cid = cid_result.unwrap();
         
     let r_contest = contests
-        .filter(crate::schema::contests::id.eq(&cid))
+        .filter(schema::contests::id.eq(&cid))
         .get_result::<Contest>(&*db)
         .expect("Error loading contest");
     
